@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:developer' as developer;
 import 'package:flutter/services.dart';
 import 'package:uniproject/Widgets/CalculateButton.dart';
 import 'package:uniproject/Pages/ResultsPage.dart';
@@ -16,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _textController = TextEditingController();
   int passmin = 60; //default pass minimum
+  bool spreadEqualWeights = false;
   final List<Map<String, TextEditingController>> textControllers = [
     {'grade': TextEditingController(), 'weight': TextEditingController()},
   ];
@@ -40,7 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void calculateResults() {
- 
     for (var controller in textControllers) {
       for (var value in controller.entries) {
         if (value.value.text.isEmpty) {
@@ -52,16 +51,18 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
 
-    int sumofweights = 0;
+    double sumofweights = 0;
 
     for (var controller in textControllers) {
       for (var value in controller.entries) {
         if (value.key == 'weight') {
-          sumofweights += int.parse(value.value.text);
+          sumofweights += double.parse(value.value.text);
         }
       }
     }
-    if (sumofweights != 100) {
+
+    if (sumofweights != 100 && sumofweights < 99.5 || sumofweights > 100.5) {
+      // for precision reasons grade can be 99.5 or 100.5
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -71,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
       );
       return;
     }
-  
+
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -97,6 +98,45 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void CheckofSpreadWeights(bool? value) {
+    setState(() {
+      spreadEqualWeights = value!;
+    });
+    if (value!) {
+      SpreadWeights();
+    }
+  }
+
+  void SpreadWeights() {
+    if (!spreadEqualWeights) {
+      return;
+    }
+
+    setState(() {
+      for (var controller in textControllers) {
+        for (var value in controller.entries) {
+          if (value.key == 'weight') {
+            value.value.text = (100 / textControllers.length).toStringAsFixed(
+              2,
+            );
+          }
+        }
+      }
+    });
+  }
+
+  void ResetInputs() {
+    setState(() {
+      for (var controller in textControllers) {
+        for (var value in controller.entries) {
+          value.value.clear();
+        }
+      }
+      passmin = 60; // Reset to default value
+      spreadEqualWeights = false; // Reset checkbox state
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: ListView.builder(
                 shrinkWrap: true,
-                itemCount: textControllers.length, // +1 for the button
+                itemCount: textControllers.length,
                 itemBuilder: (context, index) {
                   // Regular grade input row
                   return Padding(
@@ -137,17 +177,54 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Calculatebutton(calculateResults: calculateResults),
                 const SizedBox(height: 10),
-                Text(
-                  'Minimum passing grade:',
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                Minimumpassgradedropdown(
-                  passmin: passmin,
-                  changepassmin: changepassmin,
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Text(
+                            'Minimum passing grade:',
+                            style: TextStyle(
+                              color: Colors.green,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+
+                          SizedBox(
+                            width: double.infinity,
+                            child: Minimumpassgradedropdown(
+                              passmin: passmin,
+                              changepassmin: changepassmin,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    //Spreadequalweights
+                    const SizedBox(width: 10),
+                    Column(
+                      children: [
+                        const Text(
+                          'Spread equal weights:',
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Checkbox(
+                          value: spreadEqualWeights,
+                          onChanged: CheckofSpreadWeights,
+                        ),
+                      ],
+                    ),
+                    ElevatedButton(
+                      onPressed: ResetInputs,
+                      child: Text('Reset'),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -158,6 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           CreateNewController();
+          SpreadWeights();
         },
         label: const Text('Add Another Grade'),
         icon: const Icon(Icons.add),
