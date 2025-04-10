@@ -176,60 +176,71 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
             ),
-            Column(
-              children: [
-                Calculatebutton(calculateResults: calculateResults),
-                const SizedBox(height: 10),
-
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
+            Container(
+              decoration: BoxDecoration(
+                border: BorderDirectional(
+                  top: BorderSide(
+                    color: Colors.black12,
+                    width: 2,
+                  ),
+                ),
+              ),
+              child: Column(
+                
+                children: [
+                  Calculatebutton(calculateResults: calculateResults),
+                  const SizedBox(height: 10),
+              
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          children: [
+                            Text(
+                              'Minimum passing grade:',
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+              
+                            SizedBox(
+                              width: double.infinity,
+                              child: Minimumpassgradedropdown(
+                                passmin: passmin,
+                                changepassmin: changepassmin,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      //Spreadequalweights
+                      const SizedBox(width: 10),
+                      Column(
                         children: [
-                          Text(
-                            'Minimum passing grade:',
+                          const Text(
+                            'Spread equal weights:',
                             style: TextStyle(
                               color: Colors.green,
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-
-                          SizedBox(
-                            width: double.infinity,
-                            child: Minimumpassgradedropdown(
-                              passmin: passmin,
-                              changepassmin: changepassmin,
-                            ),
+                          Checkbox(
+                            value: spreadEqualWeights,
+                            onChanged: CheckofSpreadWeights,
                           ),
                         ],
                       ),
-                    ),
-                    //Spreadequalweights
-                    const SizedBox(width: 10),
-                    Column(
-                      children: [
-                        const Text(
-                          'Spread equal weights:',
-                          style: TextStyle(
-                            color: Colors.green,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Checkbox(
-                          value: spreadEqualWeights,
-                          onChanged: CheckofSpreadWeights,
-                        ),
-                      ],
-                    ),
-                    ElevatedButton(
-                      onPressed: ResetInputs,
-                      child: Text('Reset'),
-                    ),
-                  ],
-                ),
-              ],
+                      ElevatedButton(
+                        onPressed: ResetInputs,
+                        child: Text('Reset'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),
