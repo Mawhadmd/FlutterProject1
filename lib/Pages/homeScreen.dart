@@ -128,12 +128,15 @@ class _HomeScreenState extends State<HomeScreen> {
   void ResetInputs() {
     setState(() {
       for (var controller in textControllers) {
-        for (var value in controller.entries) {
-          value.value.clear();
+        for (var value in controller.values) {
+          if (textControllers.length == 1) {
+            break;
+          }
+          removeitem(textControllers.indexOf(controller));
         }
       }
-      passmin = 60; // Reset to default value
-      spreadEqualWeights = false; // Reset checkbox state
+      passmin = 60; // Reset to default (60)
+      spreadEqualWeights = false; // Reset checkbox
     });
   }
 

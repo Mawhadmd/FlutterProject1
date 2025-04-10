@@ -78,8 +78,7 @@ class _ResultspageState extends State<Resultspage> {
                 average >= widget.passmin
                     ? 'assets/success.png'
                     : 'assets/fail.png',
-                height: 400,
-                width: 400,
+          
               ),
               const SizedBox(height: 20),
               ElevatedButton(onPressed: (){Navigator.of(context).pop();}, child: Text('Go Back'))
